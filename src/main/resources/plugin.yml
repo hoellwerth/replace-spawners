@@ -1,0 +1,4 @@
+name: replace-block
+version: '${project.version}'
+main: eu.hoellwerth.replaceblock.ReplaceBlock
+api-version: '1.20'
