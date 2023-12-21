@@ -1,0 +1,26 @@
+log:
+  ingamePermission: "log.view"
+  trace:
+    console: true
+    log: true
+    ingame: false
+  debug:
+    console: true
+    log: true
+    ingame: false
+  info:
+    console: true
+    log: true
+    ingame: false
+  warn:
+    console: true
+    log: true
+    ingame: false
+  error:
+    console: true
+    log: true
+    ingame: true
+  critical:
+    console: true
+    log: true
+    ingame: true
