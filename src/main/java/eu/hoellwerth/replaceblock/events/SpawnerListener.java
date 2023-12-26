@@ -7,6 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
@@ -47,6 +48,19 @@ public class SpawnerListener implements Listener {
         if (event.getBlock().getType() == Material.SPAWNER) {
             ReplaceBlock.INSTANCE.getLogManager().writeToLog(
                     "Spawner", event.getPlayer().getDisplayName() + " place a spawner at " +
+                            event.getBlock().getLocation().getX() + " " +
+                            event.getBlock().getLocation().getY() + " " +
+                            event.getBlock().getLocation().getZ(),
+                    LogLevels.INFO
+            );
+        }
+    }
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        if (event.getBlock().getType() == Material.SPAWNER) {
+            ReplaceBlock.INSTANCE.getLogManager().writeToLog(
+                    "Spawner", event.getPlayer().getDisplayName() + " broke a spawner at " +
                             event.getBlock().getLocation().getX() + " " +
                             event.getBlock().getLocation().getY() + " " +
                             event.getBlock().getLocation().getZ(),
