@@ -2,7 +2,6 @@ package eu.hoellwerth.replaceblock.events;
 
 import eu.hoellwerth.replaceblock.ReplaceBlock;
 import eu.hoellwerth.replaceblock.utils.LogLevels;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
@@ -17,6 +16,7 @@ public class SpawnerListener implements Listener {
     @EventHandler
     public void onSpawnerSpawn(SpawnerSpawnEvent event) {
         LivingEntity entity = (LivingEntity) event.getEntity();
+        entity.setMetadata("spawner", new org.bukkit.metadata.FixedMetadataValue(ReplaceBlock.INSTANCE, true));
         entity.setHealth(0);
 
         Block block = event.getSpawner().getBlock();
@@ -35,6 +35,9 @@ public class SpawnerListener implements Listener {
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
+        if (!event.getEntity().hasMetadata("spawner")) {
+            return;
+        }
         event.setDroppedExp(0);
         event.getDrops().clear();
     }
