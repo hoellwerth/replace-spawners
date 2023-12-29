@@ -25,6 +25,7 @@ public class SpawnerListener implements Listener {
         block.getState().update();
         block.setType(Material.SPAWNER);
         block.getState().update();
+        block.setMetadata("spawner", new org.bukkit.metadata.FixedMetadataValue(ReplaceBlock.INSTANCE, true));
         ReplaceBlock.INSTANCE.getLogManager().writeToLog(
                 "Spawner", "Replaced a spawner at " +
                         event.getSpawner().getLocation().getX() + " " +
@@ -58,14 +59,21 @@ public class SpawnerListener implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        if (event.getBlock().getType() == Material.SPAWNER) {
-            ReplaceBlock.INSTANCE.getLogManager().writeToLog(
-                    "Spawner", event.getPlayer().getDisplayName() + " broke a spawner at " +
-                            event.getBlock().getLocation().getX() + " " +
-                            event.getBlock().getLocation().getY() + " " +
-                            event.getBlock().getLocation().getZ(),
-                    LogLevels.INFO
-            );
+        if (!(event.getBlock().getType() == Material.SPAWNER)) {
+            return;
         }
+
+        if (!event.getBlock().hasMetadata("spawner")) {
+            event.setCancelled(true);
+            return;
+        }
+
+        ReplaceBlock.INSTANCE.getLogManager().writeToLog(
+                "Spawner", event.getPlayer().getDisplayName() + " broke a spawner at " +
+                        event.getBlock().getLocation().getX() + " " +
+                        event.getBlock().getLocation().getY() + " " +
+                        event.getBlock().getLocation().getZ(),
+                LogLevels.INFO
+        );
     }
 }
