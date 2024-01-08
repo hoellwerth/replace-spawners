@@ -1,3 +1,6 @@
+interimBlock: "minecraft:air"
+finalBlock: "minecraft:air"
+
 log:
   ingamePermission: "log.view"
   trace:
@@ -24,3 +27,4 @@ log:
     console: true
     log: true
     ingame: true
+

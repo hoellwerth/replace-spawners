@@ -12,6 +12,8 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 
+import java.util.Objects;
+
 public class SpawnerListener implements Listener {
 
     @EventHandler
@@ -21,9 +23,12 @@ public class SpawnerListener implements Listener {
         entity.setHealth(0);
 
         Block block = event.getSpawner().getBlock();
-        block.setType(Material.AIR);
+        block.setType(Objects.requireNonNull(Material.getMaterial(Objects.requireNonNull(
+                ReplaceBlock.INSTANCE.getConfig().getString("interimBlock")))));
         block.getState().update();
-        block.setType(Material.SPAWNER);
+        block.setType(Objects.requireNonNull(Material.getMaterial(Objects.requireNonNull(
+                ReplaceBlock.INSTANCE.getConfig().getString("finalBlock")
+        ))));
         block.getState().update();
         block.setMetadata("spawner", new org.bukkit.metadata.FixedMetadataValue(ReplaceBlock.INSTANCE, true));
         ReplaceBlock.INSTANCE.getLogManager().writeToLog(
@@ -46,20 +51,24 @@ public class SpawnerListener implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (event.getBlock().getType() == Material.SPAWNER) {
-            ReplaceBlock.INSTANCE.getLogManager().writeToLog(
-                    "Spawner", event.getPlayer().getDisplayName() + " place a spawner at " +
-                            event.getBlock().getLocation().getX() + " " +
-                            event.getBlock().getLocation().getY() + " " +
-                            event.getBlock().getLocation().getZ(),
-                    LogLevels.INFO
-            );
+        if (event.getBlock().getType() != Material.SPAWNER) {
+            return;
         }
+
+        ReplaceBlock.INSTANCE.getLogManager().writeToLog(
+                "Spawner", event.getPlayer().getDisplayName() + " placed a spawner at " +
+                        event.getBlock().getLocation().getX() + " " +
+                        event.getBlock().getLocation().getY() + " " +
+                        event.getBlock().getLocation().getZ(),
+                LogLevels.INFO
+        );
+
+        event.getBlock().setMetadata("spawner", new org.bukkit.metadata.FixedMetadataValue(ReplaceBlock.INSTANCE, true));
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        if (!(event.getBlock().getType() == Material.SPAWNER)) {
+        if (event.getBlock().getType() != Material.SPAWNER) {
             return;
         }
 
