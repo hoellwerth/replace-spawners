@@ -3,8 +3,7 @@ package eu.hoellwerth.replaceblock.events;
 import eu.hoellwerth.replaceblock.ReplaceBlock;
 import eu.hoellwerth.replaceblock.utils.LogLevels;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -12,37 +11,22 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpawnerListener implements Listener {
 
     @EventHandler
     public void onSpawnerSpawn(SpawnerSpawnEvent event) {
-        LivingEntity entity = (LivingEntity) event.getEntity();
-        entity.setMetadata("spawner", new org.bukkit.metadata.FixedMetadataValue(ReplaceBlock.INSTANCE, true));
-        entity.setHealth(0);
+        List<Entity> entities = new ArrayList<>();
+        entities.add(event.getEntity());
 
-        Block block = event.getSpawner().getBlock();
-        block.setType(Objects.requireNonNull(Material.getMaterial(Objects.requireNonNull(
-                ReplaceBlock.INSTANCE.getConfig().getString("interimBlock")))));
-        block.getState().update();
-        block.setType(Objects.requireNonNull(Material.getMaterial(Objects.requireNonNull(
-                ReplaceBlock.INSTANCE.getConfig().getString("finalBlock")
-        ))));
-        block.getState().update();
-        block.setMetadata("spawner", new org.bukkit.metadata.FixedMetadataValue(ReplaceBlock.INSTANCE, true));
-        ReplaceBlock.INSTANCE.getLogManager().writeToLog(
-                "Spawner", "Replaced a spawner at " +
-                        event.getSpawner().getLocation().getX() + " " +
-                        event.getSpawner().getLocation().getY() + " " +
-                        event.getSpawner().getLocation().getZ(),
-                LogLevels.INFO
-        );
+        ReplaceBlock.INSTANCE.getReplaceBlock().replaceSpawner(entities, event.getSpawner().getBlock());
     }
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
-        if (!event.getEntity().hasMetadata("spawner")) {
+        if (!event.getEntity().hasMetadata("spawnedByASpawner")) {
             return;
         }
         event.setDroppedExp(0);
@@ -63,7 +47,7 @@ public class SpawnerListener implements Listener {
                 LogLevels.INFO
         );
 
-        event.getBlock().setMetadata("spawner", new org.bukkit.metadata.FixedMetadataValue(ReplaceBlock.INSTANCE, true));
+        event.getBlock().setMetadata("replacedSpawner", new org.bukkit.metadata.FixedMetadataValue(ReplaceBlock.INSTANCE, true));
     }
 
     @EventHandler
@@ -72,7 +56,7 @@ public class SpawnerListener implements Listener {
             return;
         }
 
-        if (!event.getBlock().hasMetadata("spawner")) {
+        if (!event.getBlock().hasMetadata("replacedSpawner")) {
             event.setCancelled(true);
             return;
         }
