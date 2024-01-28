@@ -9,9 +9,13 @@ import mc.rellox.spawnermeta.SpawnerMeta;
 import mc.rellox.spawnermeta.api.APIInstance;
 import mc.rellox.spawnermeta.api.events.SpawnerBreakEvent;
 import mc.rellox.spawnermeta.api.events.SpawnerPostSpawnEvent;
+import mc.rellox.spawnermeta.api.events.SpawnerPreSpawnEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -34,8 +38,13 @@ public final class ReplaceBlock extends JavaPlugin {
         SpawnerMeta sm = (SpawnerMeta) Bukkit.getPluginManager().getPlugin("SpawnerMeta");
         APIInstance api = Objects.requireNonNull(sm).getAPI();
 
-        api.register(SpawnerPostSpawnEvent.class, event -> {
-            ReplaceBlock.INSTANCE.getReplaceBlock().replaceSpawner(event.entities, event.getSpawner().block());
+        api.register(SpawnerPreSpawnEvent.class, event -> {
+            ReplaceBlock.INSTANCE.getReplaceBlock().replaceSpawner(new ArrayList<>(), event.getSpawner().block());
+            event.getGenerator().close();
+
+            event.cancel(true);
+
+            api.breakSpawner(event.getSpawner().block());
         });
 
         api.register(SpawnerBreakEvent.class, event -> {

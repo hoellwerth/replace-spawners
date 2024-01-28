@@ -1,7 +1,7 @@
 package eu.hoellwerth.replaceblock.utils;
 
 import eu.hoellwerth.replaceblock.ReplaceBlock;
-import org.bukkit.Bukkit;
+import mc.rellox.spawnermeta.api.spawner.IGenerator;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -19,26 +19,28 @@ public class ReplaceSpawner {
             livingEntity.setHealth(0);
         });
 
-        block.setType(Objects.requireNonNull(Material.getMaterial(Objects.requireNonNull(
-                ReplaceBlock.INSTANCE.getConfig().getString("interimBlock")))));
-        block.getState().update();
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                block.setType(Objects.requireNonNull(Material.getMaterial(Objects.requireNonNull(
-                        ReplaceBlock.INSTANCE.getConfig().getString("finalBlock")
-                ))));
-                block.getState().update();
-            }
-        }.runTaskLater(ReplaceBlock.INSTANCE, 20);
+        block.breakNaturally();
 
-        block.setMetadata("replacedSpawner", new org.bukkit.metadata.FixedMetadataValue(ReplaceBlock.INSTANCE, true));
-        ReplaceBlock.INSTANCE.getLogManager().writeToLog(
-                "Spawner", "Replaced a spawner at " +
-                        block.getLocation().getX() + " " +
-                        block.getLocation().getY() + " " +
-                        block.getLocation().getZ(),
-                LogLevels.INFO
-        );
+        Material newMaterial = Material.getMaterial(Objects.requireNonNull(
+                ReplaceBlock.INSTANCE.getConfig().getString("finalBlock")));
+        if (!(newMaterial == Material.AIR)) {
+            assert newMaterial != null;
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    block.getLocation().getBlock().setType(newMaterial);
+
+                    block.setMetadata("replacedSpawner", new org.bukkit.metadata.FixedMetadataValue(ReplaceBlock.INSTANCE, true));
+                    ReplaceBlock.INSTANCE.getLogManager().writeToLog(
+                            "Spawner", "Replaced a spawner at " +
+                                    block.getLocation().getX() + " " +
+                                    block.getLocation().getY() + " " +
+                                    block.getLocation().getZ(),
+                            LogLevels.INFO
+                    );
+                }
+            }.runTaskLater(ReplaceBlock.INSTANCE, 5);
+        }
     }
 }
