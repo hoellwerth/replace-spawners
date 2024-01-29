@@ -1,11 +1,14 @@
 package eu.hoellwerth.replaceblock.utils;
 
+import com.jeff_media.customblockdata.CustomBlockData;
 import eu.hoellwerth.replaceblock.ReplaceBlock;
-import mc.rellox.spawnermeta.api.spawner.IGenerator;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
@@ -31,7 +34,9 @@ public class ReplaceSpawner {
                 public void run() {
                     block.getLocation().getBlock().setType(newMaterial);
 
-                    block.setMetadata("replacedSpawner", new org.bukkit.metadata.FixedMetadataValue(ReplaceBlock.INSTANCE, true));
+                    PersistentDataContainer container = new CustomBlockData(block, ReplaceBlock.INSTANCE);
+                    container.set(new NamespacedKey(ReplaceBlock.INSTANCE, "replacedSpawner"), PersistentDataType.BOOLEAN, true);
+
                     ReplaceBlock.INSTANCE.getLogManager().writeToLog(
                             "Spawner", "Replaced a spawner at " +
                                     block.getLocation().getX() + " " +

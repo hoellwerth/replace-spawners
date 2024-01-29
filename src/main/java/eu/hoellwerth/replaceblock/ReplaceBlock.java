@@ -1,5 +1,6 @@
 package eu.hoellwerth.replaceblock;
 
+import com.jeff_media.customblockdata.CustomBlockData;
 import eu.hoellwerth.replaceblock.events.SpawnerListener;
 import eu.hoellwerth.replaceblock.utils.LogLevels;
 import eu.hoellwerth.replaceblock.utils.LogManager;
@@ -11,7 +12,10 @@ import mc.rellox.spawnermeta.api.events.SpawnerBreakEvent;
 import mc.rellox.spawnermeta.api.events.SpawnerPostSpawnEvent;
 import mc.rellox.spawnermeta.api.events.SpawnerPreSpawnEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -43,7 +47,8 @@ public final class ReplaceBlock extends JavaPlugin {
         }
 
         api.register(SpawnerPreSpawnEvent.class, event -> {
-            if (event.getSpawner().block().hasMetadata("replacedSpawner")) {
+            PersistentDataContainer container = new CustomBlockData(event.getSpawner().block(), ReplaceBlock.INSTANCE);
+            if (container.has(new NamespacedKey(ReplaceBlock.INSTANCE, "replacedSpawner"), PersistentDataType.BOOLEAN)) {
                 return;
             }
 
@@ -56,7 +61,9 @@ public final class ReplaceBlock extends JavaPlugin {
         });
 
         api.register(SpawnerBreakEvent.class, event -> {
-            if(!event.getSpawner().block().hasMetadata("replacedSpawner")) {
+            PersistentDataContainer container = new CustomBlockData(event.getSpawner().block(), ReplaceBlock.INSTANCE);
+
+            if(!container.has(new NamespacedKey(ReplaceBlock.INSTANCE, "replacedSpawner"), PersistentDataType.BOOLEAN)) {
                 event.cancel(true);
             }
         });
