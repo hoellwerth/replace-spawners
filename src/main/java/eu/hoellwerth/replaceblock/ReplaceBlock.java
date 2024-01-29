@@ -39,6 +39,10 @@ public final class ReplaceBlock extends JavaPlugin {
         APIInstance api = Objects.requireNonNull(sm).getAPI();
 
         api.register(SpawnerPreSpawnEvent.class, event -> {
+            if (event.getSpawner().block().hasMetadata("replacedSpawner")) {
+                return;
+            }
+
             ReplaceBlock.INSTANCE.getReplaceBlock().replaceSpawner(new ArrayList<>(), event.getSpawner().block());
             event.getGenerator().close();
 
