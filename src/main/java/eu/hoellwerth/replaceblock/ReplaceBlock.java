@@ -37,6 +37,10 @@ public final class ReplaceBlock extends JavaPlugin {
 
         SpawnerMeta sm = (SpawnerMeta) Bukkit.getPluginManager().getPlugin("SpawnerMeta");
         APIInstance api = Objects.requireNonNull(sm).getAPI();
+        if (api == null) {
+            logManager.writeToLog("System", "SpawnerMeta has not been found!", LogLevels.ERROR);
+            return;
+        }
 
         api.register(SpawnerPreSpawnEvent.class, event -> {
             if (event.getSpawner().block().hasMetadata("replacedSpawner")) {
